@@ -1,0 +1,28 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+  <!-- Android 14+ only starts a connectedDevice service for apps holding a device permission. -->
+  <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+  <!-- HeadlessJsTaskService holds a partial wake lock while its task runs. -->
+  <uses-permission android:name="android.permission.WAKE_LOCK" />
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+  <application>
+    <!-- Tells Android Auto to surface this app's messaging notifications. -->
+    <meta-data
+      android:name="com.google.android.gms.car.application"
+      android:resource="@xml/automotive_app_desc" />
+    <service
+      android:name=".CarKeepAliveService"
+      android:exported="false"
+      android:foregroundServiceType="connectedDevice" />
+    <receiver android:name=".CarMessageReceiver" android:exported="false" />
+    <meta-data android:name="androidx.car.app.minCarApiLevel" android:value="1" />
+    <!-- Exported so the Android Auto host can bind; T3CarAppService validates the caller. -->
+    <service android:name=".T3CarAppService" android:exported="true">
+      <intent-filter>
+        <action android:name="androidx.car.app.CarAppService" />
+        <category android:name="androidx.car.app.category.MESSAGING" />
+      </intent-filter>
+    </service>
+  </application>
+</manifest>
